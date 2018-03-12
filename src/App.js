@@ -62,7 +62,6 @@ class BooksApp extends React.Component {
   };
 
   onShelfChanged = (id, oldValue, newValue) => {
-    console.log("[ON SHELF CHANGED]", this.state);
     let book = this.state.books[id];
     if (book) {
       return BooksAPI.update(book, newValue).then(bookListing => {
