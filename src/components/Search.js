@@ -27,12 +27,11 @@ class Search extends Component {
   };
 
   render() {
-    let booksInShelf = Object.keys(this.props.books);
     let searchResult = null;
     if (this.state.books.length > 0) {
       searchResult = this.state.books.map((book, index) => {
         let shelf = null;
-        if (book.id && booksInShelf.includes(book.id)) {
+        if (book.id && this.props.books[book.id]) {
           shelf = this.props.books[book.id].shelf;
         }
         return (
