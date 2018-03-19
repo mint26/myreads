@@ -28,6 +28,10 @@ class BooksApp extends React.Component {
   };
 
   componentDidMount() {
+    this.reloadState();
+  }
+
+  reloadState() {
     this.getBooks().then(response => {
       let { bookListing, books } = response;
       this.setState({ bookListing: bookListing, books: books });
@@ -65,17 +69,12 @@ class BooksApp extends React.Component {
     let book = this.state.books[id];
     if (book) {
       return BooksAPI.update(book, newValue).then(bookListing => {
-        let tmpBooks = JSON.parse(JSON.stringify(this.state.books)) || {};
-        tmpBooks[id].shelf = newValue;
-        this.setState({ bookListing: bookListing, books: tmpBooks });
+        this.reloadState();
       });
     } else {
       return BooksAPI.get(id).then(book => {
         return BooksAPI.update(book, newValue).then(bookListing => {
-          let tmpBooks = JSON.parse(JSON.stringify(this.state.books)) || {};
-          tmpBooks[id] = book;
-          tmpBooks[id].shelf = newValue;
-          this.setState({ bookListing: bookListing, books: tmpBooks });
+          this.reloadState();
         });
       });
     }
@@ -91,11 +90,7 @@ class BooksApp extends React.Component {
         return (
           <Book
             key={`book-${books[id].title}`}
-            id={id}
-            title={books[id].title}
-            authors={books[id].authors}
-            bookURL={books[id].imageLinks.thumbnail}
-            shelf={books[id].shelf}
+            book={books[id]}
             onShelfChanged={this.onShelfChanged}
           />
         );

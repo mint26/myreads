@@ -3,28 +3,21 @@ import propTypes from "prop-types";
 
 class Book extends Component {
   static propTypes = {
-    title: propTypes.string.isRequired,
-    authors: propTypes.array,
-    bookURL: propTypes.string,
-    shelf: propTypes.string,
-    onShelfChanged: propTypes.func,
-    id: propTypes.string.isRequired
+    book: propTypes.object,
+    onShelfChange: propTypes.func
   };
 
-  state = {
-    shelf: this.props.shelf
-  };
-
-  onShelfChange = e => {
+  onShelfChange = (e, id, shelf) => {
     let newValue = e.target.value;
-    this.props.onShelfChanged(this.props.id, this.state.shelf, newValue);
-    this.setState({ shelf: newValue });
+    this.props.onShelfChanged(id, shelf, newValue);
   };
 
   render() {
-    let coverImage = this.props.bookURL ? null : (
-      <div className="book-cover-placeholder">No cover available</div>
-    );
+    let { title, imageLinks, authors, shelf, id } = this.props.book;
+    let coverImage =
+      imageLinks && imageLinks.thumbnail ? null : (
+        <div className="book-cover-placeholder">No cover available</div>
+      );
     return (
       <li>
         <div className="book">
@@ -34,15 +27,17 @@ class Book extends Component {
               style={{
                 width: 128,
                 height: 193,
-                backgroundImage: `url(${this.props.bookURL})`
+                backgroundImage: `url(${imageLinks.thumbnail})`
               }}
             >
               {coverImage}
             </div>
             <div className="book-shelf-changer">
               <select
-                onChange={this.onShelfChange}
-                value={this.state.shelf ? this.state.shelf : "none"}
+                onChange={e => {
+                  this.onShelfChange(e, id, shelf);
+                }}
+                value={shelf ? shelf : "none"}
               >
                 <option value="label" disabled>
                   Move to...
@@ -54,10 +49,8 @@ class Book extends Component {
               </select>
             </div>
           </div>
-          <div className="book-title">{this.props.title}</div>
-          <div className="book-authors">
-            {this.props.authors ? this.props.authors.join(",") : ""}
-          </div>
+          <div className="book-title">{title}</div>
+          <div className="book-authors">{authors ? authors.join(",") : ""}</div>
         </div>
       </li>
     );

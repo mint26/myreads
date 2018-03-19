@@ -10,42 +10,42 @@ class Search extends Component {
       BooksAPI.search(val).then(data => {
         this.setState({
           query: val,
-          books: data
+          books: data.error
+            ? []
+            : data.filter(book => !this.props.books[book.id]),
+          your_books: data.error
+            ? []
+            : data.filter(book => this.props.books[book.id])
         });
       });
     } else {
       this.setState({
         query: "",
-        books: []
+        books: [],
+        your_books: []
       });
     }
   };
 
   state = {
     query: "",
-    books: []
+    books: [],
+    your_books: []
   };
 
   render() {
     let searchResult = null;
-    if (this.state.books.length > 0) {
-      searchResult = this.state.books.map((book, index) => {
-        let shelf = null;
-        if (book.id && this.props.books[book.id]) {
-          shelf = this.props.books[book.id].shelf;
-        }
+    let availableBooks =
+      this.state.books.length > 0
+        ? this.state.books.filter(book => !this.props.books[book.id])
+        : [];
+
+    if (availableBooks.length > 0) {
+      searchResult = availableBooks.map((book, index) => {
         return (
           <Book
-            key={`search-result-book-${index}`}
-            id={book.id}
-            title={book.title}
-            authors={book.authors}
-            bookURL={
-              book.imageLinks && book.imageLinks.thumbnail
-                ? book.imageLinks.thumbnail
-                : ""
-            }
-            shelf={shelf}
+            key={`book-${index}`}
+            book={book}
             onShelfChanged={this.props.onShelfChanged}
           />
         );
